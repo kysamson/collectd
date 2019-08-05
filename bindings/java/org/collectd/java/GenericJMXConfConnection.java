@@ -39,6 +39,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 
 import org.collectd.api.Collectd;
 import org.collectd.api.PluginData;
@@ -116,6 +117,14 @@ class GenericJMXConfConnection
       environment = new HashMap<String,Object> ();
       environment.put (JMXConnector.CREDENTIALS, credentials);
       environment.put (JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, this.getClass().getClassLoader());
+    }
+
+    if (Boolean.parseBoolean(System.getProperty("ssl.enable")))
+    {
+      if (environment == null)
+        environment = new HashMap ();
+      environment.put("com.sun.jndi.rmi.factory.socket", new SslRMIClientSocketFactory());
+      Collectd.logInfo("Connecting to JMX with SSL");
     }
 
     try
